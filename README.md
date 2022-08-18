@@ -3,7 +3,9 @@ Programming test.
 
 Write a command-line Java program that fetches data from the following public API:
 https://github.com/M-Media-Group/Covid-19-API
+
 Once executed, the program should request the user to input a country name.
+
 Once the user provides the country name, the application should display:
   - the information regarding cases for the current moment:
     * confirmed
