@@ -14,6 +14,7 @@ Once the user provides the country name, the application should display:
     * vaccinated level in % of total population
   - based on historical data should be shown:
     * new confirmed cases since last data available
+
 Additional requirements:
   - Application should have unit test coverage.
   - The code should follow good practices and have comments.
