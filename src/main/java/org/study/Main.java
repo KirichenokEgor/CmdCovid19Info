@@ -1,8 +1,6 @@
 package org.study;
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
 import org.study.response.CasesUrlResponse;
 import org.study.response.HistoryUrlResponse;
 import org.study.response.VaccinesUrlResponse;
@@ -37,23 +35,44 @@ public class Main {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("country", country);
 
+        //do /cases request in order to get confirmed, recovered, deaths
         String content = safeDoRequest(CASES_URL, parameters);
-        Gson gson = new GsonBuilder().create();
-        CasesUrlResponse response1 = gson.fromJson(JsonUtils.getJsonElement(content, "All"), CasesUrlResponse.class);
+        CasesUrlResponse response1 = getResponseObject(content, CasesUrlResponse.class);
 
+        //do /vaccines request in order to get peopleVaccinated, population
         content = safeDoRequest(VACCINES_URL, parameters);
-        VaccinesUrlResponse response2 = gson.fromJson(JsonUtils.getJsonElement(content, "All"), VaccinesUrlResponse.class);
+        VaccinesUrlResponse response2 = getResponseObject(content, VaccinesUrlResponse.class);
 
+        //do /history request in order to get confirmed according to date
         parameters.put("status", "confirmed");
         content = safeDoRequest(HISTORY_URL, parameters);
-        JsonElement jel = JsonUtils.getJsonElement(content, "All");
-        HistoryUrlResponse response3 = gson.fromJson(jel, HistoryUrlResponse.class);
+        HistoryUrlResponse response3 = getResponseObject(content, HistoryUrlResponse.class);
 
-        CountryCovidData ccd = new CountryCovidData();
-        ccd.setData(country, response1, response2, response3);
+        //fill result object
+        CountryCovidData ccd = new CountryCovidData(country);
+        ccd.setData(response1, response2, response3);
         System.out.println(ccd);
     }
 
+    /**
+     * Fills obj with info from JsonElement with name "All"
+     *
+     * @param content  content from response
+     * @param classOfT class of response object
+     * @param <T>      response object class parameter
+     * @return response object
+     */
+    static <T> T getResponseObject(String content, Class<T> classOfT) {
+        Gson gson = new Gson();
+        return gson.fromJson(JsonUtils.getJsonElement(content, "All"), classOfT);
+    }
+
+    /**
+     * doRequest with exception handling
+     *
+     * @param urlStr     String with URL
+     * @param parameters Map of parameters for GET requestm response or empty String in case of IOException
+     */
     static String safeDoRequest(String urlStr, Map<String, String> parameters) {
         String content = null;
         try {
@@ -65,6 +84,14 @@ public class Main {
         return content;
     }
 
+    /**
+     * performs a GET request with given url and parameters
+     *
+     * @param urlStr     String with URL
+     * @param parameters Map of parameters for GET request
+     * @return content from response or empty String in case of response code is not 200
+     * @throws IOException if smth goes wrong with connection
+     */
     static String doRequest(String urlStr, Map<String, String> parameters) throws IOException {
         URL url = new URL(urlStr + ParameterStringBuilder.getParamsString(parameters));
         HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
@@ -85,7 +112,7 @@ public class Main {
         return content.toString();
     }
 
-    private static class CountryCovidData {
+    static class CountryCovidData {
         private String country;
         private Long confirmed;
         private Long recovered;
@@ -94,8 +121,18 @@ public class Main {
         private Long confirmedSinceLastHistoryData;
         private Date lastHistoryDataDate;
 
-        public void setData(String country, CasesUrlResponse r1, VaccinesUrlResponse r2, HistoryUrlResponse r3) {
+        public CountryCovidData(String country) {
             this.country = country;
+        }
+
+        /**
+         * sets field values from responses
+         *
+         * @param r1 CasesUrlResponse
+         * @param r2 VaccinesUrlResponse
+         * @param r3 HistoryUrlResponse
+         */
+        public void setData(CasesUrlResponse r1, VaccinesUrlResponse r2, HistoryUrlResponse r3) {
             if (r1 != null) {
                 confirmed = r1.getConfirmed();
                 recovered = r1.getRecovered();
@@ -113,6 +150,10 @@ public class Main {
             }
         }
 
+        /**
+         * @param obj Object
+         * @return String representation of obj or "info not available" if obj is null
+         */
         private String nullableObjectToString(Object obj) {
             return Objects.isNull(obj) ? "info not available" : obj.toString();
         }
@@ -120,7 +161,7 @@ public class Main {
         @Override
         public String toString() {
             StringBuilder sb = new StringBuilder();
-            sb.append("COUNTRY : ").append(country).append('\n')
+            sb.append("COUNTRY : ").append(nullableObjectToString(country)).append('\n')
                     .append("DATA : ").append('\n')
                     .append("    confirmed : ").append(nullableObjectToString(confirmed)).append('\n')
                     .append("    recovered : ").append(nullableObjectToString(recovered)).append('\n')
@@ -129,6 +170,34 @@ public class Main {
                     .append("    confirmed since ").append(nullableObjectToString(lastHistoryDataDate)).append(" : ")
                     .append(nullableObjectToString(confirmedSinceLastHistoryData)).append('\n');
             return sb.toString();
+        }
+
+        public String getCountry() {
+            return country;
+        }
+
+        public Long getConfirmed() {
+            return confirmed;
+        }
+
+        public Long getRecovered() {
+            return recovered;
+        }
+
+        public Long getDeaths() {
+            return deaths;
+        }
+
+        public Double getVaccinatedLevel() {
+            return vaccinatedLevel;
+        }
+
+        public Long getConfirmedSinceLastHistoryData() {
+            return confirmedSinceLastHistoryData;
+        }
+
+        public Date getLastHistoryDataDate() {
+            return lastHistoryDataDate;
         }
     }
 }
