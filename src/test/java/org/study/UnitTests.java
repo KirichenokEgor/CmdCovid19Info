@@ -41,7 +41,7 @@ public class UnitTests {
     void safeDoRequestCorrect() {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("country", "France");
-        String content = infoService.safeDoRequest(infoService.getAppProps().getProperty("CASES_URL"), parameters);
+        String content = infoService.doRequest(infoService.getAppProps().getProperty("CASES_URL"), parameters);
         assertFalse(content.isEmpty());
     }
 
@@ -50,7 +50,7 @@ public class UnitTests {
     void safeDoRequestIncorrectUrl() {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("country", "France");
-        String content = infoService.safeDoRequest(infoService.getAppProps().getProperty("CASES_URL") + "la", parameters);
+        String content = infoService.doRequest(infoService.getAppProps().getProperty("CASES_URL") + "la", parameters);
         assertTrue(content.isEmpty());
     }
 
@@ -60,7 +60,7 @@ public class UnitTests {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("wrongParam", "ooo");
         parameters.put("country", "France");
-        String content = infoService.safeDoRequest(infoService.getAppProps().getProperty("CASES_URL"), parameters);
+        String content = infoService.doRequest(infoService.getAppProps().getProperty("CASES_URL"), parameters);
         assertFalse(content.isEmpty());
     }
 
@@ -69,7 +69,7 @@ public class UnitTests {
     void safeDoRequestIncorrectParamsValues() {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("status", "bugaga");
-        String content = infoService.safeDoRequest(infoService.getAppProps().getProperty("HISTORY_URL"), parameters);
+        String content = infoService.doRequest(infoService.getAppProps().getProperty("HISTORY_URL"), parameters);
         assertTrue(content.contains("\"dates\": {}}}}"));
     }
 
@@ -77,7 +77,7 @@ public class UnitTests {
     @Test
     void safeDoRequestEmptyParams() {
         Map<String, String> parameters = new HashMap<>();
-        String content = infoService.safeDoRequest(infoService.getAppProps().getProperty("HISTORY_URL"), parameters);
+        String content = infoService.doRequest(infoService.getAppProps().getProperty("HISTORY_URL"), parameters);
         assertTrue(content.isEmpty());
     }
 
