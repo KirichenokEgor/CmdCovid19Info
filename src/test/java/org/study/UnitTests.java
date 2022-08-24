@@ -81,41 +81,39 @@ public class UnitTests {
         assertTrue(content.isEmpty());
     }
 
-    //CasesUrlResponse
-    //r1 from good content
+    //CasesUrlResponse from good content
     @Test
     void fillCasesUrlResponseFromGoodContent() {
         String content = "{\"All\": {\"confirmed\": 33357883, \"recovered\": 0, \"deaths\": 149992, \"country\": \"France\"," +
                 " \"population\": 64979548, \"sq_km_area\": 551500, \"life_expectancy\": \"78.8\", \"elevation_in_meters\": 375," +
                 " \"continent\": \"Europe\", \"abbreviation\": \"FR\", \"location\": \"Western Europe\", \"iso\": 250," +
                 " \"capital_city\": \"Paris\", \"lat\": \"46.2276\", \"long\": \"2.2137\", \"updated\": \"2022-08-19 04:20:54\"} }";
-        CasesUrlResponse r1 = infoService.getResponseObject(content, CasesUrlResponse.class);
-        assertEquals(r1.getConfirmed(), 33357883L);
-        assertEquals(r1.getRecovered(), 0L);
-        assertEquals(r1.getDeaths(), 149992L);
+        CasesUrlResponse cases = infoService.getResponseObject(content, CasesUrlResponse.class);
+        assertEquals(33357883L, cases.getConfirmed());
+        assertEquals(0L, cases.getRecovered());
+        assertEquals(149992L, cases.getDeaths());
     }
 
-    //r1 from bad content
+    //CasesUrlResponse from bad content
     @Test
     void fillCasesUrlResponseFromBadContent() {
         String content = "{\"Alldfdsdf\": {\"confirmed\": 33357883, \"recovered\": 0, \"deaths\": 149992, \"country\": \"France\"," +
                 " \"population\": 64979548, \"sq_km_area\": 551500, \"life_expectancy\": \"78.8\", \"elevation_in_meters\": 375," +
                 " \"continent\": \"Europe\", \"abbreviation\": \"FR\", \"location\": \"Western Europe\", \"iso\": 250," +
                 " \"capital_city\": \"Paris\", \"lat\": \"46.2276\", \"long\": \"2.2137\", \"updated\": \"2022-08-19 04:20:54\"} }";
-        CasesUrlResponse r1 = infoService.getResponseObject(content, CasesUrlResponse.class);
-        assertNull(r1);
+        CasesUrlResponse cases = infoService.getResponseObject(content, CasesUrlResponse.class);
+        assertNull(cases);
     }
 
-    //r1 from empty content
+    //CasesUrlResponse from empty content
     @Test
     void fillCasesUrlResponseFromEmptyContent() {
         String content = "";
-        CasesUrlResponse r1 = infoService.getResponseObject(content, CasesUrlResponse.class);
-        assertNull(r1);
+        CasesUrlResponse cases = infoService.getResponseObject(content, CasesUrlResponse.class);
+        assertNull(cases);
     }
 
-    //VaccinesUrlResponse
-    //r2 from good content
+    //VaccinesUrlResponse from good content
     @Test
     void fillVaccinesUrlResponseFromGoodContent() {
         String content = "{\"All\": {\"administered\": 152404977, \"people_vaccinated\": 53019788," +
@@ -123,12 +121,12 @@ public class UnitTests {
                 " \"sq_km_area\": 551500, \"life_expectancy\": \"78.8\", \"elevation_in_meters\": 375," +
                 " \"continent\": \"Europe\", \"abbreviation\": \"FR\", \"location\": \"Western Europe\", \"iso\": 250," +
                 " \"capital_city\": \"Paris\", \"updated\": \"2022/08/19 00:00:00+00\"} }";
-        VaccinesUrlResponse r2 = infoService.getResponseObject(content, VaccinesUrlResponse.class);
-        assertEquals(r2.getPeopleVaccinated(), 53019788L);
-        assertEquals(r2.getPopulation(), 64979548L);
+        VaccinesUrlResponse vaccines = infoService.getResponseObject(content, VaccinesUrlResponse.class);
+        assertEquals(53019788L, vaccines.getPeopleVaccinated());
+        assertEquals(64979548L, vaccines.getPopulation());
     }
 
-    //r2 from bad content
+    //VaccinesUrlResponse from bad content
     @Test
     void fillVaccinesUrlResponseFromBadContent() {
         String content = "{\"Alqwewql\": {\"administered\": 152404977, \"people_vaccinated\": 53019788," +
@@ -136,156 +134,154 @@ public class UnitTests {
                 " \"sq_km_area\": 551500, \"life_expectancy\": \"78.8\", \"elevation_in_meters\": 375," +
                 " \"continent\": \"Europe\", \"abbreviation\": \"FR\", \"location\": \"Western Europe\", \"iso\": 250," +
                 " \"capital_city\": \"Paris\", \"updated\": \"2022/08/19 00:00:00+00\"} }";
-        VaccinesUrlResponse r2 = infoService.getResponseObject(content, VaccinesUrlResponse.class);
-        assertNull(r2);
+        VaccinesUrlResponse vaccines = infoService.getResponseObject(content, VaccinesUrlResponse.class);
+        assertNull(vaccines);
     }
 
-    //r2 from empty content
+    //VaccinesUrlResponse from empty content
     @Test
     void fillVaccinesUrlResponseFromEmptyContent() {
         String content = "";
-        VaccinesUrlResponse r2 = infoService.getResponseObject(content, VaccinesUrlResponse.class);
-        assertNull(r2);
+        VaccinesUrlResponse vaccines = infoService.getResponseObject(content, VaccinesUrlResponse.class);
+        assertNull(vaccines);
     }
 
-    //HistoryUrlResponse
-    //r3 from good content
+    //HistoryUrlResponse from good content
     @Test
     void fillHistoryUrlResponseFromGoodContent() throws ParseException {
         String content = "{\"All\": {\"country\": \"France\", \"population\": 64979548, \"sq_km_area\": 551500," +
                 " \"life_expectancy\": \"78.8\", \"elevation_in_meters\": 375, \"continent\": \"Europe\"," +
                 " \"abbreviation\": \"FR\", \"location\": \"Western Europe\", \"iso\": 250, \"capital_city\": \"Paris\"," +
                 " \"dates\": {\"2022-08-18\": 33357883, \"2022-08-17\": 33334278} } }";
-        HistoryUrlResponse r3 = infoService.getResponseObject(content, HistoryUrlResponse.class);
-        assertNotNull(r3.getConfirmedByDateMap());
+        HistoryUrlResponse history = infoService.getResponseObject(content, HistoryUrlResponse.class);
+        assertNotNull(history.getConfirmedByDateMap());
         Map<Date, Long> map = new TreeMap<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         map.put(sdf.parse("2022-08-18"), 33357883L);
         map.put(sdf.parse("2022-08-17"), 33334278L);
-        for (Map.Entry<Date, Long> entry : r3.getConfirmedByDateMap().entrySet()) {
-            assertEquals(entry.getValue(), map.get(entry.getKey()));
+        for (Map.Entry<Date, Long> entry : history.getConfirmedByDateMap().entrySet()) {
+            assertEquals(map.get(entry.getKey()), entry.getValue());
         }
-//        assertEquals(r2.getPopulation(), 64979548L);
     }
 
-    //r3 from bad content
+    //HistoryUrlResponse from bad content
     @Test
     void fillHistoryUrlResponseFromBadContent() {
         String content = "{\"Aasdasll\": {\"country\": \"France\", \"population\": 64979548, \"sq_km_area\": 551500," +
                 " \"life_expectancy\": \"78.8\", \"elevation_in_meters\": 375, \"continent\": \"Europe\"," +
                 " \"abbreviation\": \"FR\", \"location\": \"Western Europe\", \"iso\": 250, \"capital_city\": \"Paris\"," +
                 " \"dates\": {\"2022-08-18\": 33357883, \"2022-08-17\": 33334278} } }";
-        HistoryUrlResponse r3 = infoService.getResponseObject(content, HistoryUrlResponse.class);
-        assertNull(r3);
+        HistoryUrlResponse history = infoService.getResponseObject(content, HistoryUrlResponse.class);
+        assertNull(history);
     }
 
-    //r3 from empty content
+    //HistoryUrlResponse from empty content
     @Test
     void fillHistoryUrlResponseFromEmptyContent() {
         String content = "";
-        HistoryUrlResponse r3 = infoService.getResponseObject(content, HistoryUrlResponse.class);
-        assertNull(r3);
+        HistoryUrlResponse history = infoService.getResponseObject(content, HistoryUrlResponse.class);
+        assertNull(history);
     }
 
     CasesUrlResponse getCasesUrlResponse() {
-        CasesUrlResponse r1 = new CasesUrlResponse();
-        r1.setConfirmed(1L);
-        r1.setRecovered(2L);
-        r1.setDeaths(3L);
-        return r1;
+        CasesUrlResponse cases = new CasesUrlResponse();
+        cases.setConfirmed(1L);
+        cases.setRecovered(2L);
+        cases.setDeaths(3L);
+        return cases;
     }
 
     VaccinesUrlResponse getVaccinesUrlResponse() {
-        VaccinesUrlResponse r2 = new VaccinesUrlResponse();
-        r2.setPeopleVaccinated(3L);
-        r2.setPopulation(4L);
-        return r2;
+        VaccinesUrlResponse vaccines = new VaccinesUrlResponse();
+        vaccines.setPeopleVaccinated(3L);
+        vaccines.setPopulation(4L);
+        return vaccines;
     }
 
     HistoryUrlResponse getHistoryUrlResponse() throws ParseException {
-        HistoryUrlResponse r3 = new HistoryUrlResponse();
+        HistoryUrlResponse history = new HistoryUrlResponse();
         Map<Date, Long> map = new LinkedHashMap<>();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         map.put(sdf.parse("2022-08-18"), 0L);
         map.put(sdf.parse("2022-08-17"), 0L);
-        r3.setConfirmedByDateMap(map);
-        return r3;
+        history.setConfirmedByDateMap(map);
+        return history;
     }
 
-    //ccd from good r1,r2,r3
+    //ccd from good CasesUrlResponse,VaccinesUrlResponse,HistoryUrlResponse
     @Test
     void fillCountryCovidData123() throws ParseException {
         String country = "France";
-        CasesUrlResponse r1 = getCasesUrlResponse();
-        VaccinesUrlResponse r2 = getVaccinesUrlResponse();
-        HistoryUrlResponse r3 = getHistoryUrlResponse();
+        CasesUrlResponse cases = getCasesUrlResponse();
+        VaccinesUrlResponse vaccines = getVaccinesUrlResponse();
+        HistoryUrlResponse history = getHistoryUrlResponse();
 
-        CountryCovidData ccd = CountryCovidData.of(country, r1, r2, r3);
+        CountryCovidData ccd = infoService.getCountryCovidData(country, cases, vaccines, history);
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-        assertEquals(ccd.getCountry(), country);
-        assertEquals(ccd.getConfirmed(), 1L);
-        assertEquals(ccd.getRecovered(), 2L);
-        assertEquals(ccd.getDeaths(), 3L);
-        assertEquals(ccd.getVaccinatedLevel(), 75.0d);
-        assertEquals(ccd.getLastHistoryDataDate(), sdf.parse("2022-08-18"));
-        assertEquals(ccd.getConfirmedSinceLastHistoryData(), 1L);
+        assertEquals(country, ccd.getCountry());
+        assertEquals(1L, ccd.getConfirmed());
+        assertEquals(2L, ccd.getRecovered());
+        assertEquals(3L, ccd.getDeaths());
+        assertEquals(75.0d, ccd.getVaccinatedLevel());
+        assertEquals(sdf.parse("2022-08-18"), ccd.getLastHistoryDataDate());
+        assertEquals(1L, ccd.getConfirmedSinceLastHistoryData());
     }
 
-    //ccd from good r1,r2
+    //ccd from good CasesUrlResponse,VaccinesUrlResponse
     @Test
     void fillCountryCovidData12() throws ParseException {
         String country = "France";
-        CasesUrlResponse r1 = getCasesUrlResponse();
-        VaccinesUrlResponse r2 = getVaccinesUrlResponse();
+        CasesUrlResponse cases = getCasesUrlResponse();
+        VaccinesUrlResponse vaccines = getVaccinesUrlResponse();
 
-        CountryCovidData ccd = CountryCovidData.of(country, r1, r2, null);
+        CountryCovidData ccd = infoService.getCountryCovidData(country, cases, vaccines, null);
 
-        assertEquals(ccd.getCountry(), country);
-        assertEquals(ccd.getConfirmed(), 1L);
-        assertEquals(ccd.getRecovered(), 2L);
-        assertEquals(ccd.getDeaths(), 3L);
-        assertEquals(ccd.getVaccinatedLevel(), 75.0d);
-        assertEquals(ccd.getLastHistoryDataDate(), null);
-        assertEquals(ccd.getConfirmedSinceLastHistoryData(), null);
+        assertEquals(country, ccd.getCountry());
+        assertEquals(1L, ccd.getConfirmed());
+        assertEquals(2L, ccd.getRecovered());
+        assertEquals(3L, ccd.getDeaths());
+        assertEquals(75.0d, ccd.getVaccinatedLevel());
+        assertEquals(null, ccd.getLastHistoryDataDate());
+        assertEquals(null, ccd.getConfirmedSinceLastHistoryData());
     }
 
-    //ccd from good r1,r3
+    //ccd from good CasesUrlResponse,HistoryUrlResponse
     @Test
     void fillCountryCovidData13() throws ParseException {
         String country = "France";
-        CasesUrlResponse r1 = getCasesUrlResponse();
-        HistoryUrlResponse r3 = getHistoryUrlResponse();
+        CasesUrlResponse cases = getCasesUrlResponse();
+        HistoryUrlResponse history = getHistoryUrlResponse();
 
-        CountryCovidData ccd = CountryCovidData.of(country, r1, null, r3);
+        CountryCovidData ccd = infoService.getCountryCovidData(country, cases, null, history);
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
-        assertEquals(ccd.getCountry(), country);
-        assertEquals(ccd.getConfirmed(), 1L);
-        assertEquals(ccd.getRecovered(), 2L);
-        assertEquals(ccd.getDeaths(), 3L);
-        assertEquals(ccd.getVaccinatedLevel(), null);
-        assertEquals(ccd.getLastHistoryDataDate(), sdf.parse("2022-08-18"));
-        assertEquals(ccd.getConfirmedSinceLastHistoryData(), 1L);
+        assertEquals(country, ccd.getCountry());
+        assertEquals(1L, ccd.getConfirmed());
+        assertEquals(2L, ccd.getRecovered());
+        assertEquals(3L, ccd.getDeaths());
+        assertEquals(null, ccd.getVaccinatedLevel());
+        assertEquals(sdf.parse("2022-08-18"), ccd.getLastHistoryDataDate());
+        assertEquals(1L, ccd.getConfirmedSinceLastHistoryData());
     }
 
-    //ccd from good r2,r3
+    //ccd from good VaccinesUrlResponse,HistoryUrlResponse
     @Test
     void fillCountryCovidData23() throws ParseException {
         String country = "France";
-        VaccinesUrlResponse r2 = getVaccinesUrlResponse();
-        HistoryUrlResponse r3 = getHistoryUrlResponse();
+        VaccinesUrlResponse vaccines = getVaccinesUrlResponse();
+        HistoryUrlResponse history = getHistoryUrlResponse();
 
-        CountryCovidData ccd = CountryCovidData.of(country, null, r2, r3);
+        CountryCovidData ccd = infoService.getCountryCovidData(country, null, vaccines, history);
 
-        assertEquals(ccd.getCountry(), country);
-        assertEquals(ccd.getConfirmed(), null);
-        assertEquals(ccd.getRecovered(), null);
-        assertEquals(ccd.getDeaths(), null);
-        assertEquals(ccd.getVaccinatedLevel(), 75.0d);
-        assertEquals(ccd.getLastHistoryDataDate(), null);
-        assertEquals(ccd.getConfirmedSinceLastHistoryData(), null);
+        assertEquals(country, ccd.getCountry());
+        assertEquals(null, ccd.getConfirmed());
+        assertEquals(null, ccd.getRecovered());
+        assertEquals(null, ccd.getDeaths());
+        assertEquals(75.0d, ccd.getVaccinatedLevel());
+        assertEquals(null, ccd.getLastHistoryDataDate());
+        assertEquals(null, ccd.getConfirmedSinceLastHistoryData());
     }
 }
