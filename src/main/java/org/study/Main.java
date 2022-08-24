@@ -11,7 +11,6 @@ public class Main {
     public static void main(String[] args) {
         String country = IOUtils.getNotBlankLineFromCmd("Please, enter the country: ");
 
-        //fill result object
         Covid19InfoService infoService = null;
         try {
             infoService = new Covid19InfoService();
@@ -19,6 +18,8 @@ public class Main {
             System.out.println("Can't read properties");
             return;
         }
+
+        //fill result object
         CountryCovidData ccd = infoService.getCountryCovidData(country);
         System.out.println(ccd);
     }

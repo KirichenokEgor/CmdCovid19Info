@@ -16,6 +16,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -41,19 +42,54 @@ public class Covid19InfoService {
 
         //do /cases request in order to get confirmed, recovered, deaths
         String content = doRequest(appProps.getProperty("CASES_URL"), parameters);
-        CasesUrlResponse response1 = getResponseObject(content, CasesUrlResponse.class);
+        CasesUrlResponse cases = getResponseObject(content, CasesUrlResponse.class);
 
         //do /vaccines request in order to get peopleVaccinated, population
         content = doRequest(appProps.getProperty("VACCINES_URL"), parameters);
-        VaccinesUrlResponse response2 = getResponseObject(content, VaccinesUrlResponse.class);
+        VaccinesUrlResponse vaccines = getResponseObject(content, VaccinesUrlResponse.class);
 
         //do /history request in order to get confirmed according to date
         parameters.put("status", "confirmed");
         content = doRequest(appProps.getProperty("HISTORY_URL"), parameters);
-        HistoryUrlResponse response3 = getResponseObject(content, HistoryUrlResponse.class);
+        HistoryUrlResponse history = getResponseObject(content, HistoryUrlResponse.class);
 
         //fill result object
-        return CountryCovidData.of(country, response1, response2, response3);
+        return getCountryCovidData(country, cases, vaccines, history);
+    }
+
+    /**
+     * generates CountryCovidData from given params
+     *
+     * @param country  String
+     * @param cases    CasesUrlResponse
+     * @param vaccines VaccinesUrlResponse
+     * @param history  HistoryUrlResponse
+     */
+    public CountryCovidData getCountryCovidData(String country, CasesUrlResponse cases,
+                                                VaccinesUrlResponse vaccines, HistoryUrlResponse history) {
+        if (country == null || country.isEmpty()) return null;
+        CountryCovidData.CountryCovidDataBuilder builder = CountryCovidData.builder();
+        builder.country(country);
+//        CountryCovidData ccd = new CountryCovidData(country);
+        Long tempConfirmed = null;
+        if (cases != null) {
+            builder.confirmed(cases.getConfirmed())
+                    .recovered(cases.getRecovered())
+                    .deaths(cases.getDeaths());
+            tempConfirmed = cases.getConfirmed();
+        }
+        if (vaccines != null && vaccines.getPopulation() != 0L) {
+            builder.vaccinatedLevel((vaccines.getPeopleVaccinated() + 0d) / vaccines.getPopulation() * 100);
+        }
+        if (history != null && history.getConfirmedByDateMap() != null && !history.getConfirmedByDateMap().isEmpty()
+                && tempConfirmed != null) {
+            Map.Entry<Date, Long> e = history.getConfirmedByDateMap().entrySet().stream().findFirst().orElse(null);//.limit(1L).forEach(e -> {
+            if (e != null) {
+                builder.lastHistoryDataDate(e.getKey());
+                builder.confirmedSinceLastHistoryData(tempConfirmed - e.getValue());
+            }
+        }
+        return builder.build();
     }
 
     /**
